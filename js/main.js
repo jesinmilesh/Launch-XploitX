@@ -3,8 +3,9 @@
  *
  * Sequence:
  *   1. User activates Core 01, Core 02, Core 03.
- *   2. Directly plays the fullscreen cinematic video (video.mp4).
- *   3. Upon video completion, directly redirects to https://www.xploitxctf.me/
+ *   2. Plays fullscreen video.mp4.
+ *   3. Upon video.mp4 completion, plays video1.mp4.
+ *   4. Upon video1.mp4 completion, directly redirects to https://www.xploitxctf.me/
  */
 
 import { audio }                                 from './audio.js';
@@ -93,7 +94,7 @@ function _activateCore(id) {
   _updateStatusPanel(count);
 
   if (count === 3) {
-    // Immediately after 3rd button is clicked: play video directly, then redirect!
+    // Immediately after 3rd button is clicked: play video sequence, then redirect!
     setTimeout(() => _advance('UPLOADED_VIDEO'), 600);
   }
 }
@@ -121,15 +122,15 @@ function _fadeOutApp() {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// PLAY VIDEO DIRECTLY & REDIRECT UPON COMPLETION
+// PLAY VIDEO SEQUENCE & REDIRECT UPON COMPLETION
 // ─────────────────────────────────────────────────────────────────
-function _playCinematicVideo(onComplete) {
+function _playCinematicVideos(playlist, onComplete) {
   const layer     = $('video-layer');
   const video     = $('cinematic-video');
   const unmuteBtn = $('video-unmute-btn');
   const btnUnmute = $('btn-unmute');
 
-  if (!layer || !video) {
+  if (!layer || !video || !playlist || playlist.length === 0) {
     if (onComplete) onComplete();
     return;
   }
@@ -141,6 +142,7 @@ function _playCinematicVideo(onComplete) {
   // Duck background audio so video soundtrack dominates
   audio.duck(0.1, 0.5);
 
+  let currentIdx = 0;
   let finished = false;
 
   const finish = () => {
@@ -153,28 +155,40 @@ function _playCinematicVideo(onComplete) {
     }, 400);
   };
 
-  const onEnded = () => {
-    video.removeEventListener('ended', onEnded);
-    finish();
-  };
+  const playNextVideo = () => {
+    if (currentIdx >= playlist.length) {
+      finish();
+      return;
+    }
 
-  video.addEventListener('ended', onEnded);
+    const src = playlist[currentIdx];
+    video.src = src;
+    video.currentTime = 0;
 
-  // Play video with audio if permitted
-  video.currentTime = 0;
-  const playPromise = video.play();
+    const onEnded = () => {
+      video.removeEventListener('ended', onEnded);
+      currentIdx++;
+      playNextVideo();
+    };
 
-  if (playPromise !== undefined) {
-    playPromise.catch(err => {
-      console.warn('[Video] Autoplay with audio restricted, playing muted:', err);
-      video.muted = true;
-      if (unmuteBtn) unmuteBtn.classList.remove('hidden');
-      video.play().catch(e => {
-        console.error('[Video] Playback failed:', e);
-        finish();
+    video.addEventListener('ended', onEnded);
+
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn(`[Video] Autoplay restricted for ${src}, trying muted:`, err);
+        video.muted = true;
+        if (unmuteBtn) unmuteBtn.classList.remove('hidden');
+        video.play().catch(e => {
+          console.error(`[Video] Playback failed for ${src}:`, e);
+          video.removeEventListener('ended', onEnded);
+          currentIdx++;
+          playNextVideo();
+        });
       });
-    });
-  }
+    }
+  };
 
   if (btnUnmute) {
     btnUnmute.onclick = (e) => {
@@ -183,6 +197,8 @@ function _playCinematicVideo(onComplete) {
       if (unmuteBtn) unmuteBtn.classList.add('hidden');
     };
   }
+
+  playNextVideo();
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -198,7 +214,7 @@ function _advance(next) {
       _fadeOutApp();
       clearVFX();
       _hideBanner();
-      _playCinematicVideo(() => _advance('REDIRECTING'));
+      _playCinematicVideos(['./video.mp4', './video1.mp4'], () => _advance('REDIRECTING'));
       break;
 
     // 2 ── DIRECT REDIRECT ────────────────────────────────────────
@@ -209,3 +225,4 @@ function _advance(next) {
       break;
   }
 }
+

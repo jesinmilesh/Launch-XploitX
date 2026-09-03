@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Radial & Linear Gradients -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0e071c"/>
+      <stop offset="100%" stop-color="#020205"/>
+    </radialGradient>
+
+    <linearGradient id="neonBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#7000ff"/>
+    </linearGradient>
+
+    <linearGradient id="cyberRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff0055"/>
+      <stop offset="100%" stop-color="#ff5500"/>
+    </linearGradient>
+
+    <!-- Sci-Fi Glow Filters -->
+    <filter id="glowBlue" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <filter id="glowRed" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Dark Hexagonal Frame -->
+  <path d="M 256 16 L 464 120 L 464 392 L 256 496 L 48 392 L 48 120 Z" 
+        fill="url(#bgGrad)" 
+        stroke="#00f0ff" 
+        stroke-width="12" 
+        stroke-opacity="0.8" 
+        filter="url(#glowBlue)" />
+
+  <!-- Inner Cyber Red Hexagon Contour -->
+  <path d="M 256 42 L 438 133 L 438 379 L 256 470 L 74 379 L 74 133 Z" 
+        fill="none" 
+        stroke="#ff0055" 
+        stroke-width="4" 
+        stroke-dasharray="24, 12" 
+        stroke-opacity="0.6" />
+
+  <!-- XPLOITX Cyber "X" Insignia with Energy Beam Cut -->
+  <g filter="url(#glowBlue)">
+    <!-- Left-to-Right Diagonal Beam -->
+    <path d="M 140 140 L 190 140 L 372 372 L 322 372 Z" fill="url(#neonBlue)" />
+    <!-- Right-to-Left Diagonal Beam -->
+    <path d="M 372 140 L 322 140 L 140 372 L 190 372 Z" fill="url(#neonBlue)" />
+  </g>
+
+  <!-- Central Energy Core Bolt -->
+  <path d="M 276 170 L 226 266 L 266 266 L 236 342 L 286 246 L 246 246 Z" 
+        fill="url(#cyberRed)" 
+        filter="url(#glowRed)" />
+</svg>

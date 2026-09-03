@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XPLOITX — DOOMSDAY GATEWAY PROTOCOL</title>
+  <meta name="description" content="XPLOITX CTF Doomsday Gateway. Three cores. One gateway. Activate the reactors." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+
+  <!-- ── LAYER 0: Three.js WebGL 3D Scene ─────────────────── -->
+  <canvas id="gl-canvas"></canvas>
+
+  <!-- ── LAYER 1: 2D VFX Canvas (lasers / portal / warp) ──── -->
+  <canvas id="vfx-canvas"></canvas>
+
+  <!-- ── LAYER 1.5: Cinematic Fullscreen Video Layer ──────── -->
+  <div id="video-layer" class="hidden">
+    <video id="cinematic-video" src="./video.mp4" playsinline preload="auto"></video>
+    <div class="video-vignette"></div>
+    <div class="video-grain"></div>
+    <div id="video-unmute-btn" class="hidden">
+      <button id="btn-unmute" class="hud-btn">🔊 TAP FOR CINEMATIC AUDIO</button>
+    </div>
+  </div>
+
+  <!-- ── LAYER 2: CRT Overlay ─────────────────────────────── -->
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <!-- ── LAYER 3: Screen Flash ────────────────────────────── -->
+  <div id="flash" aria-hidden="true"></div>
+
+  <!-- ── LAYER 4: Main HUD UI ─────────────────────────────── -->
+  <div id="app">
+
+    <!-- TOP HUD BAR -->
+    <header id="hud">
+      <div class="hud-l">
+        <span class="hud-brand">⚡ XPLOITX // DOOMSDAY GATEWAY</span>
+        <span id="hud-clock" class="hud-clock"></span>
+      </div>
+      <div class="hud-r">
+        <button id="btn-motion" class="hud-btn" aria-label="Toggle motion effects">FX: MAX</button>
+        <button id="btn-audio"  class="hud-btn" aria-label="Toggle audio">AUDIO: ON</button>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section id="hero">
+      <div class="hero-logo-wrap">
+        <h1 id="hero-title">XPLOITX</h1>
+        <div class="hero-line"></div>
+      </div>
+      <h2 id="hero-sub">DOOMSDAY PROTOCOL</h2>
+      <p class="hero-tagline">Three cores. One gateway. Activate the reactors.</p>
+    </section>
+
+    <!-- STATUS BADGE -->
+    <div id="status-panel">
+      <div id="status-dot" class="sdot sdot-standby"></div>
+      <div id="status-text">
+        <div id="status-counter">0 / 3 CORES ONLINE</div>
+        <div id="status-msg">SYSTEM STATUS: STANDBY</div>
+      </div>
+    </div>
+
+    <!-- THREE CORES -->
+    <section id="cores-grid">
+
+      <!-- CORE 01 -->
+      <article class="core-card" id="card-1" data-core="1">
+        <div class="core-frame" style="--col:#c1001f;--glow:#ff0055;">
+          <svg class="core-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <!-- rotating rings via CSS -->
+            <circle class="ring r1" cx="80" cy="80" r="70" />
+            <circle class="ring r2" cx="80" cy="80" r="56" />
+            <circle class="ring r3" cx="80" cy="80" r="42" />
+            <!-- vent slots -->
+            <line x1="80" y1="10" x2="80" y2="22" />
+            <line x1="80" y1="138" x2="80" y2="150" />
+            <line x1="10" y1="80" x2="22" y2="80" />
+            <line x1="138" y1="80" x2="150" y2="80" />
+            <!-- core chamber -->
+            <circle class="core-chamber" cx="80" cy="80" r="24" />
+            <circle class="core-inner" cx="80" cy="80" r="12" />
+          </svg>
+          <div class="core-meta">
+            <div class="core-id">CORE 01</div>
+            <div class="core-name">QUANTUM MATRIX</div>
+          </div>
+          <div class="core-stats">
+            <div class="stat-row">
+              <span class="stat-label">STATUS</span>
+              <span class="stat-val" id="s1-status">OFFLINE</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">OUTPUT</span>
+              <span class="stat-val" id="s1-output">0%</span>
+            </div>
+            <div class="energy-bar"><div class="energy-fill" id="e1"></div></div>
+          </div>
+          <button class="core-btn" id="btn-core-1">
+            <span class="btn-pulse"></span>
+            ACTIVATE CORE 01
+          </button>
+        </div>
+      </article>
+
+      <!-- CORE 02 -->
+      <article class="core-card" id="card-2" data-core="2">
+        <div class="core-frame" style="--col:#007ba5;--glow:#00f0ff;">
+          <svg class="core-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring r1" cx="80" cy="80" r="70" />
+            <circle class="ring r2" cx="80" cy="80" r="56" />
+            <circle class="ring r3" cx="80" cy="80" r="42" />
+            <line x1="80" y1="10" x2="80" y2="22" />
+            <line x1="80" y1="138" x2="80" y2="150" />
+            <line x1="10" y1="80" x2="22" y2="80" />
+            <line x1="138" y1="80" x2="150" y2="80" />
+            <circle class="core-chamber" cx="80" cy="80" r="24" />
+            <circle class="core-inner" cx="80" cy="80" r="12" />
+          </svg>
+          <div class="core-meta">
+            <div class="core-id">CORE 02</div>
+            <div class="core-name">NEURAL CONDUIT</div>
+          </div>
+          <div class="core-stats">
+            <div class="stat-row">
+              <span class="stat-label">STATUS</span>
+              <span class="stat-val" id="s2-status">OFFLINE</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">OUTPUT</span>
+              <span class="stat-val" id="s2-output">0%</span>
+            </div>
+            <div class="energy-bar"><div class="energy-fill" id="e2"></div></div>
+          </div>
+          <button class="core-btn" id="btn-core-2">
+            <span class="btn-pulse"></span>
+            ACTIVATE CORE 02
+          </button>
+        </div>
+      </article>
+
+      <!-- CORE 03 -->
+      <article class="core-card" id="card-3" data-core="3">
+        <div class="core-frame" style="--col:#6b21a8;--glow:#a855f7;">
+          <svg class="core-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring r1" cx="80" cy="80" r="70" />
+            <circle class="ring r2" cx="80" cy="80" r="56" />
+            <circle class="ring r3" cx="80" cy="80" r="42" />
+            <line x1="80" y1="10" x2="80" y2="22" />
+            <line x1="80" y1="138" x2="80" y2="150" />
+            <line x1="10" y1="80" x2="22" y2="80" />
+            <line x1="138" y1="80" x2="150" y2="80" />
+            <circle class="core-chamber" cx="80" cy="80" r="24" />
+            <circle class="core-inner" cx="80" cy="80" r="12" />
+          </svg>
+          <div class="core-meta">
+            <div class="core-id">CORE 03</div>
+            <div class="core-name">VOID REACTOR</div>
+          </div>
+          <div class="core-stats">
+            <div class="stat-row">
+              <span class="stat-label">STATUS</span>
+              <span class="stat-val" id="s3-status">OFFLINE</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">OUTPUT</span>
+              <span class="stat-val" id="s3-output">0%</span>
+            </div>
+            <div class="energy-bar"><div class="energy-fill" id="e3"></div></div>
+          </div>
+          <button class="core-btn" id="btn-core-3">
+            <span class="btn-pulse"></span>
+            ACTIVATE CORE 03
+          </button>
+        </div>
+      </article>
+
+    </section><!-- /cores-grid -->
+
+    <footer id="footer-bar">
+      XPLOITX SECURITY SYSTEMS // DOOMSDAY GATEWAY ENGAGEMENT v3.0
+    </footer>
+
+  </div><!-- /app -->
+
+  <!-- ── CINEMATIC OVERLAY (full-screen phases) ────────────── -->
+  <div id="cinematic" class="hidden">
+    <div id="cin-title"></div>
+    <div id="cin-sub"></div>
+    <div id="cin-progress" class="hidden">
+      <div id="cin-prog-bar"><div id="cin-prog-fill"></div></div>
+      <div id="cin-prog-label"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
